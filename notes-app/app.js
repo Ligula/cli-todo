@@ -23,22 +23,23 @@ yargs.command({
         }
     },
     handler: function (argv) {
-        var msg = chalk.green('Added todo ') + chalk.yellowBright.italic(argv.m) + chalk.green()
-        var priority = ''
-
-        if(argv.p) {
-            priority =  chalk.green(' with priority ') + chalk.red(argv.p)
-        } 
-        console.log(msg + priority )
+        notes.addTodo(argv.m, argv.p)
     }
 })
 
 // remove todo 
 yargs.command({
-    command: 'remove',
+    command: 'rmv',
     describe: 'removes a todo',
-    handler: function () {
-        console.log(chalk.red('Removing todo!'))
+    builder: {
+        id: {
+            describe: 'ID of todo to remove',
+            demandOption: true,
+            type: 'number'
+        }
+    },
+    handler: function (argv) {
+        notes.removeTodo(argv.id)
     }
 })
 
