@@ -1,4 +1,5 @@
 const chalk = require('chalk')
+const table = require('cli-table3')
 const fs = require('fs')
 
 const getNotes = function() {
@@ -8,8 +9,13 @@ const getNotes = function() {
 //add date functionality 
 const addTodo = function(message, priority) {
     const todos = loadTodos()
-
     const dupes = todos.filter(todo => todo.message === message)
+
+    if(priority) {
+        priorityMsg =  chalk.green(' with priority ') + chalk.red(priority)
+    } else {
+        priority = 99
+    }
 
     if(dupes.length === 0) {
         todos.push({
@@ -23,9 +29,7 @@ const addTodo = function(message, priority) {
         var msg = chalk.green('Added todo ') + chalk.yellowBright.italic(message) + chalk.green()
         var priorityMsg = ''
 
-        if(priority) {
-            priorityMsg =  chalk.green(' with priority ') + chalk.red(priority)
-        } 
+
         console.log(msg + priorityMsg)
     }
     else {
@@ -52,6 +56,33 @@ const removeTodo = function(id) {
     }
 }
 
+const listTodos = function() {
+    const todos = loadTodos()
+
+    todos.sort((a,b) => { 
+        
+        if(a.priority === null) {
+            return 1;
+        }
+        else {
+           return  a.priority - b.priority
+        }
+    })
+
+    const tabl = new table({
+        head: ['ID', 'Message', 'Priority'],
+        colWidths: [10,20,10]
+    })
+
+    for(var i=0; i<todos.length; i++) {
+        tabl.push(
+            [todos[i].id, todos[i].message, todos[i].priority]
+        )
+    }
+    console.log(chalk.green(tabl.toString()))
+
+}
+
 const saveTodo = function(todos) {
     const dataJSON = JSON.stringify(todos)
     fs.writeFileSync('todos.json', dataJSON)
@@ -70,5 +101,6 @@ const loadTodos = function () {
 module.exports = {
     getNotes: getNotes,
     addTodo: addTodo,
-    removeTodo: removeTodo
+    removeTodo: removeTodo,
+    listTodos: listTodos
 }
