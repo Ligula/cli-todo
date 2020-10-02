@@ -9,15 +9,15 @@ const getNotes = function() {
 //add date functionality 
 const addTodo = function(message, priority) {
     const todos = loadTodos()
-    const dupes = todos.filter(todo => todo.message === message)
-
+    const dupes = todos.find(todo => todo.message === message)
+    
     if(priority) {
         priorityMsg =  chalk.green(' with priority ') + chalk.red(priority)
     } else {
         priority = 99
     }
 
-    if(dupes.length === 0) {
+    if(!dupes) {
         todos.push({
             id: todos.length+1,
             message: message,
@@ -45,9 +45,7 @@ const removeTodo = function(id) {
         const index = todos.indexOf(removedTodo[0])
 
         todos.splice(index, 1)
-        const dataJSON = JSON.stringify(todos)
-
-        fs.writeFileSync('todos.json', dataJSON)
+        saveTodo(todos)
 
         console.log(chalk.green('Successfully removed todo ') + chalk.red(removedTodo[0].id) + " " + chalk.yellow(removedTodo[0].message))
     }
@@ -74,11 +72,12 @@ const listTodos = function() {
         colWidths: [10,20,10]
     })
 
-    for(var i=0; i<todos.length; i++) {
+    todos.forEach(todo => {
         tabl.push(
-            [todos[i].id, todos[i].message, todos[i].priority]
+            [todo.id, todo.message, todo.priority]
         )
-    }
+    })
+        
     console.log(chalk.green(tabl.toString()))
 
 }
